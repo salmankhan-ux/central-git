@@ -10,7 +10,9 @@ pipeline {
         stage('Connect to EC2') {
             steps {
                 sh """
-                ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ec2-user@${EC2_IP} "echo Connected from Jenkins"
+                    ssh -o StrictHostKeyChecking=no \
+                    -i ${SSH_KEY} ec2-user@${EC2_IP} \
+                    "echo Connected from Jenkins"
                 """
             }
         }
@@ -18,7 +20,9 @@ pipeline {
         stage('Run Docker Command') {
             steps {
                 sh """
-                ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ec2-user@${EC2_IP} "docker ps && docker run --rm hello-world"
+                    ssh -o StrictHostKeyChecking=no \
+                    -i ${SSH_KEY} ec2-user@${EC2_IP} \
+                    "docker ps && docker run --rm hello-world"
                 """
             }
         }

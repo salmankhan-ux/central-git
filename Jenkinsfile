@@ -1,29 +1,24 @@
 pipeline {
     agent any
 
-    environment {
-        EC2_IP = '13.51.171.237'
-        SSH_KEY = '/var/lib/jenkins/.ssh/my-key.pem'
-    }
-
     stages {
-        stage('Connect to EC2') {
+        stage('Build') {
             steps {
-                sh """
-                    ssh -o StrictHostKeyChecking=no \
-                    -i ${SSH_KEY} ec2-user@${EC2_IP} \
-                    "echo Connected from Jenkins"
-                """
+                echo 'Building the application...'
             }
         }
 
-        stage('Run Docker Command') {
+        stage('Deploy') {
             steps {
-                sh """
-                    ssh -o StrictHostKeyChecking=no \
-                    -i ${SSH_KEY} ec2-user@${EC2_IP} \
-                    "docker ps && docker run --rm hello-world"
-                """
+                script {
+                    def dockerCmd = "docker run --rm hello-world"
+
+                    sshagent(['ec2-server-key']) {
+                        sh """
+                            ssh -o StrictHostKeyChecking=no ec2-user@13.51.171.237 '${dockerCmd}'
+                        """
+                    }
+                }
             }
         }
     }

@@ -8,16 +8,26 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
+        stage('Connect to EC2') {
             steps {
-                script {
-                    def dockerCmd = "docker run --rm hello-world"
+                sshagent(['ec2-server-key']) {
+                    sh """
+                        ssh -o StrictHostKeyChecking=no \
+                        ec2-user@13.51.171.237 \
+                        "echo Connected from Jenkins"
+                    """
+                }
+            }
+        }
 
-                    sshagent(['ec2-server-key']) {
-                        sh """
-                            ssh -o StrictHostKeyChecking=no ec2-user@13.51.171.237 '${dockerCmd}'
-                        """
-                    }
+        stage('Run Docker Command') {
+            steps {
+                sshagent(['ec2-server-key']) {
+                    sh """
+                        ssh -o StrictHostKeyChecking=no \
+                        ec2-user@13.51.171.237 \
+                        "docker run --rm hello-world"
+                    """
                 }
             }
         }
